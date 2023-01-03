@@ -1,4 +1,6 @@
 import telebot
+import download_img
+import os
 import random
 # ідентифікатори повідомлень
 # message.from_user.first_name - перше ім'я користувача (ім'я)
@@ -15,12 +17,14 @@ def bot_start(message):
     # Відправник повідомлень
     bot.send_message(message.chat.id, "Hello, User! My name is IntensiveRandomBot!", reply_markup = keyboard)
     bot.register_next_step_handler(message, all_commands)
+
 # Створюємо кнопку Play
 button_play = telebot.types.KeyboardButton("Play")
+button_photo = telebot.types.KeyboardButton("sendFoto")
 # Створюємо клавіатуру
 keyboard = telebot.types.ReplyKeyboardMarkup()
 # Додаємо до клавіатури створену кнопку
-keyboard.add(button_play)
+keyboard.add(button_play, button_photo)
 #
 space = " "
 # Функція що виконує команди бота
@@ -36,6 +40,11 @@ def all_commands(message):
         bot.register_next_step_handler(message, win_lose, number)
     if message.text.lower() == "/hi":
         bot.send_message(message.chat.id, f"Nice, to meet you! {message.from_user.username}!")
+    if message.text.lower() == "sendfoto":
+        file = open(os.path.join(os.path.abspath(__file__ + "/.."), "4.png"), 'rb')
+        bot.send_photo(message.chat.id, file, "Картка героя!")
+
+        # bot.send_photo(message.chat.id, "https://klike.net/uploads/posts/2019-11/1574514215_2.jpg")
     bot.register_next_step_handler(message, all_commands)
 # Створюємо функцію що перевіряє виграв чи програв користувач
 def win_lose(message, number):
@@ -47,4 +56,4 @@ def win_lose(message, number):
         bot.send_message(message.chat.id, f"Sorry {message.from_user.first_name}, you don`t guessed!", reply_markup = keyboard)
     
 # Опитування всіх чатів
-bot.polling()
+bot.polling(none_stop=True)
